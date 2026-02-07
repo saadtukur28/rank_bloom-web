@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bloom - 24/7 AI Support</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Specific Styles for Chat Bloom Page */
+        body {
+            background: #030712;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Prevent body scroll, let chat container scroll */
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #e2e8f0;
+        }
+
+        .chat-header {
+            padding: 1rem 2rem;
+            background: #111827;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .chat-container {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bot-message {
+            background: #1f2937;
+            color: #e2e8f0;
+            border-top-left-radius: 2px;
+            align-self: flex-start;
+            border: 1px solid #374151;
+        }
+
+        .user-message {
+            background: #22c55e;
+            color: #ffffff;
+            border-top-right-radius: 2px;
+            align-self: flex-end;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .chat-input-area {
+            background: #111827;
+            padding: 20px;
+            border-top: 1px solid #1e293b;
+        }
+
+        .input-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #1f2937;
+            border: 1px solid #374151;
+            padding: 14px 20px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #4ade80;
+        }
+
+        .send-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #4ade80;
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .typing-indicator.active {
+            opacity: 1;
+        }
+
+        /* Nav back button override */
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #4ade80;
+        }
+
+        /* Clickable suggestions */
+        .suggested-q {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            color: #60a5fa;
+        }
+
+        .suggested-q:hover {
+            background: rgba(96, 165, 250, 0.1);
+            color: #93c5fd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="chat-header">
+        <div class="logo" style="font-size: 1.4rem;">Chat Bloom <span
+                style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">Beta</span></div>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </header>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="message bot-message">
+            Hello! I'm <strong>Chat Bloom</strong>, RankBloom's AI assistant. 🤖<br><br>
+            I can help you with:
+            <ul style="margin-top: 8px; margin-left: 20px;">
+                <li class="suggested-q" onclick="sendSuggestion('How much does a website cost?')">Website pricing &
+                    packages</li>
+                <li class="suggested-q" onclick="sendSuggestion('I want to book a free consultation')">Booking a
+                    consultation</li>
+                <li class="suggested-q" onclick="sendSuggestion('How does SEO work?')">SEO questions</li>
+                <li class="suggested-q" onclick="sendSuggestion('Do you offer payment plans?')">General inquiries</li>
+            </ul>
+            <br>
+            How can I help you today?
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <div style="max-width: 900px; margin: 0 auto; margin-bottom: 8px;" class="typing-indicator"
+            id="typingIndicator">Chat Bloom is typing...</div>
+        <div class="input-wrapper">
+            <input type="text" class="chat-input" placeholder="Type your message..." id="messageInput">
+            <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        function addMessage(text, isUser = false) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            div.innerHTML = text;
+            chatContainer.appendChild(div);
+            // Auto scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleSend() {
+            const originalText = messageInput.value.trim();
+            if (!originalText) return;
+
+            // Add User Message
+            addMessage(originalText, true);
+            messageInput.value = '';
+
+            // Simulate AI Delay & Response
+            typingIndicator.classList.add('active');
+
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+
+                // Simple auto-responses for demo purposes
+                let response = "That sounds great! A member of our team usually handles complex requests, but I've noted that down. Would you like to check our pricing?";
+
+                const lowerText = originalText.toLowerCase();
+                if (lowerText.includes('price') || lowerText.includes('cost')) {
+                    response = "Our websites typically start from $500 depending on complexity. SEO packages start at $300/mo. Would you like a custom quote?";
+                } else if (lowerText.includes('hello') || lowerText.includes('hi')) {
+                    response = "Hi there! 👋 How can I boost your business today?";
+                } else if (lowerText.includes('mentor')) {
+                    response = "Mentoring is a great choice! You can apply directly through our Instagram page.";
+                }
+
+                addMessage(response, false);
+            }, 1000);
+        }
+
+        function sendSuggestion(text) {
+            messageInput.value = text;
+            handleSend();
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    </script>
+</body>
+
+</html>
