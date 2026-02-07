@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  base: '/rankbloom/',
   // Basic configuration for a static site
   server: {
     port: 3000,
