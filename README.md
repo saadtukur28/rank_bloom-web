@@ -2,7 +2,7 @@
 
 RankBloom is a high-performance, aesthetically driven web agency focused on helping small businesses scale through fast, SEO-optimized, and mobile-ready websites.
 
-![Project Preview](public/videos/business_district_2.png)
+![Project Preview](https://saadtukur28.github.io/rank_bloom-web/)
 
 ## 🚀 Technlogy Stack
 - **Frontend:** Vanilla HTML5, CSS3 (Modern Flex/Grid), JavaScript (ES6+)
